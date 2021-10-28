@@ -7,6 +7,7 @@ function App() {
   const auth=getAuth();
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
+  const[error,setError]=useState('');
 
   const handleEmailChange=e=>{
     setEmail(e.target.value)
@@ -17,13 +18,27 @@ function App() {
   }
    
   const handleRegistration=e=>{
+    
+     e.preventDefault();
+     console.log(email,password);
+    if(password.length<6){
+      setError('Password must be 6 character long');
+      return;
+    }
+    if(!/(?=.*[A-Z].*[A-Z]) /.test(password)){
+        setError('password must contain uppercases')
+        return;
+    }
     createUserWithEmailAndPassword(auth,email,password)
     .then(res=>{
       const user=res.user;
-      console.log(user)
+      console.log(user);
+      setError('');
     })
-     console.log(email,password);
-     e.preventDefault();
+    .catch(error=>{
+      setError(error.message)
+    })
+     
   }
   return (
     <div className="mx-5">
@@ -44,6 +59,9 @@ function App() {
        <div class="mb-3 form-check">
            <input type="checkbox" class="form-check-input" id="exampleCheck1"/>
            <label class="form-check-label" for="exampleCheck1">Example checkbox</label>
+       </div>
+       <div className='row-mb-3 text-danger'>
+         {error}
        </div>
 
        <button type="submit" class="btn btn-primary">Register</button>
