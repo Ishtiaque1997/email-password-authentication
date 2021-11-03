@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
 import initialiizeAuthentication from './firebase/firebaseinit';
 initialiizeAuthentication();
 function App() {
@@ -8,6 +8,7 @@ function App() {
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
   const[error,setError]=useState('');
+  const[isLogin,setIsLogin]=useState(false)
 
   const handleEmailChange=e=>{
     setEmail(e.target.value)
@@ -16,7 +17,9 @@ function App() {
   const handlePasswordChange=e=>{
     setPassword(e.target.value)
   }
-   
+   const toggleLogin=e=>{
+     setIsLogin(e.target.checked);
+   }
   const handleRegistration=e=>{
     
      e.preventDefault();
@@ -29,7 +32,21 @@ function App() {
         setError('password must contain uppercases')
         return;
     }
-    createUserWithEmailAndPassword(auth,email,password)
+   isLogin?processLogin(email,password):createNewUser(email,password);
+     
+  }
+  const processLogin=(email,password)=>{
+    signInWithEmailAndPassword(auth,email,password)
+    .then(res=>{
+      const user=res.user;
+      console.log(user)
+    })
+    .catch(error=>{
+      setError(error.message)
+    })
+  }
+  const createNewUser=(email,password)=>{
+     createUserWithEmailAndPassword(auth,email,password)
     .then(res=>{
       const user=res.user;
       console.log(user);
@@ -38,12 +55,11 @@ function App() {
     .catch(error=>{
       setError(error.message)
     })
-     
   }
   return (
     <div className="mx-5">
      <form onSubmit={handleRegistration}>
-       <h3 className='text-primary'>Please Register</h3>
+       <h3 className='text-primary'>Please {isLogin?'Login':'Register'}</h3>
 
        <div class="mb-3">
          <label for="exampleInputEmail1" class="form-label">Email address</label>
@@ -57,14 +73,16 @@ function App() {
        </div>
 
        <div class="mb-3 form-check">
-           <input type="checkbox" class="form-check-input" id="exampleCheck1"/>
-           <label class="form-check-label" for="exampleCheck1">Example checkbox</label>
+           <input onChange={toggleLogin} type="checkbox" class="form-check-input" id="exampleCheck1"/>
+           <label class="form-check-label" for="exampleCheck1">Already registered?</label>
        </div>
        <div className='row-mb-3 text-danger'>
          {error}
        </div>
 
-       <button type="submit" class="btn btn-primary">Register</button>
+       <button type="submit" class="btn btn-primary">
+         {isLogin?'Login':'Register'}
+         </button>
        
       </form>
     </div>
