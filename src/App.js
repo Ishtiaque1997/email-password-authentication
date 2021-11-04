@@ -9,6 +9,7 @@ function App() {
   const auth=getAuth();
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
+  const[error,setError]=useState('');
 
   const handleGoogleSignIn=()=>{
    signInWithPopup(auth,googleProvider)
@@ -23,13 +24,26 @@ function App() {
 
   
  const handleRegistration=(e)=>{
-   e.preventDefault();
+  e.preventDefault();
+   console.log(email,password)
+   if(password.length<6){
+     setError('password must be at least 6 characters')
+     return ;
+   }
+   if(!/(?=.*[A-Z].*[A-Z])/.test(password)){
+     setError('password must contain upper case');
+     return;
+   }
    createUserWithEmailAndPassword(auth,email,password)
    .then(res=>{
      const user=res.user;
-     console.log(user)
+     console.log(user);
+     setError('');
    })
-   console.log(email,password)
+   .catch(error=>{
+     setError(error.message)
+   })
+    
 }
 
 const handleEmailChange=e=>{
@@ -69,6 +83,9 @@ const handlePasswordChange=e=>{
         </label>
       </div>
     </div>
+  </div>
+  <div className='row mb-3'>
+    {error}
   </div>
   <button type="submit" className="btn btn-primary">Register</button>
 </form>
