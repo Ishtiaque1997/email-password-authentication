@@ -10,6 +10,7 @@ function App() {
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
   const[error,setError]=useState('');
+  const[isLogin,setIsLogin]=useState(false);
 
   const handleGoogleSignIn=()=>{
    signInWithPopup(auth,googleProvider)
@@ -34,6 +35,32 @@ function App() {
      setError('password must contain upper case');
      return;
    }
+  isLogin?processLogin(email,password):createNewUser(email,password)
+    
+}
+const processLogin=(email,password)=>{
+  signInWithEmailAndPassword(auth,email,password)
+  .then(res=>{
+    const user=res.user;
+    console.log(user);
+  })
+  .catch(error=>{
+    setError(error.message)
+  })
+
+}
+const toggleLogin=e=>{
+  setIsLogin(e.target.checked);
+}
+const handleEmailChange=e=>{
+  setEmail(e.target.value);
+}
+
+const handlePasswordChange=e=>{
+  setPassword(e.target.value);
+}
+
+const createNewUser=(email,password)=>{
    createUserWithEmailAndPassword(auth,email,password)
    .then(res=>{
      const user=res.user;
@@ -43,24 +70,13 @@ function App() {
    .catch(error=>{
      setError(error.message)
    })
-    
 }
-
-const handleEmailChange=e=>{
-  setEmail(e.target.value);
-}
-
-const handlePasswordChange=e=>{
-  setPassword(e.target.value);
-}
-
-
   
   
   return (
     <div className='mx-5'>
      <form onSubmit={handleRegistration}>
-       <h3 className='text-primary'>Please register</h3>
+       <h3 className='text-primary'>Please {isLogin?'Login':'Register'}</h3>
   <div className="row mb-3">
     <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">Email</label>
     <div className="col-sm-10">
@@ -77,9 +93,9 @@ const handlePasswordChange=e=>{
   <div className="row mb-3">
     <div className="col-sm-10 offset-sm-2">
       <div className="form-check">
-        <input className="form-check-input" type="checkbox" id="gridCheck1"/>
+        <input onChange={toggleLogin}className="form-check-input" type="checkbox" id="gridCheck1"/>
         <label className="form-check-label" htmlFor="gridCheck1">
-          Example checkbox
+          Already registered?
         </label>
       </div>
     </div>
@@ -87,7 +103,7 @@ const handlePasswordChange=e=>{
   <div className='row mb-3'>
     {error}
   </div>
-  <button type="submit" className="btn btn-primary">Register</button>
+  <button type="submit" className="btn btn-primary">{isLogin?'Login':'Register'}</button>
 </form>
       <br /><br /><br />
     <div>--------------</div>
