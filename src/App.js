@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import { getAuth, signInWithPopup,GoogleAuthProvider,sendEmailVerification,createUserWithEmailAndPassword,sendPasswordResetEmail,signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth,updateProfile, signInWithPopup,GoogleAuthProvider,sendEmailVerification,createUserWithEmailAndPassword,sendPasswordResetEmail,signInWithEmailAndPassword } from "firebase/auth";
 import initialiizeAuthentication from './firebase/firebaseinit';
 initialiizeAuthentication();
 const googleProvider=new GoogleAuthProvider();
@@ -11,6 +11,7 @@ function App() {
   const[password,setPassword]=useState('');
   const[error,setError]=useState('');
   const[isLogin,setIsLogin]=useState(false);
+  const[name,setName]=useState('');
 
   const handleGoogleSignIn=()=>{
    signInWithPopup(auth,googleProvider)
@@ -66,6 +67,9 @@ const toggleLogin=e=>{
 const handleEmailChange=e=>{
   setEmail(e.target.value);
 }
+const handleNameChange=e=>{
+  setName(e.target.value);
+}
 
 const handlePasswordChange=e=>{
   setPassword(e.target.value);
@@ -78,10 +82,19 @@ const createNewUser=(email,password)=>{
      console.log(user);
      setError('');
      verifyEmail();
+     setUserName();
    })
    .catch(error=>{
      setError(error.message)
    })
+}
+const setUserName=()=>{
+  updateProfile(auth.currentUser,{
+    displayName:name
+  })
+  .then(res=>{
+
+  })
 }
   
   
@@ -89,6 +102,15 @@ const createNewUser=(email,password)=>{
     <div className='mx-5'>
      <form onSubmit={handleRegistration}>
        <h3 className='text-primary'>Please {isLogin?'Login':'Register'}</h3>
+{!isLogin &&
+           <div className="row-mb-3">
+           <label for="inputAddress" className="form-label">Name</label>
+    <div className='col-sm-10'>
+      
+    <input type="text"onBlur={handleNameChange} className="form-control" id="inputAddress" placeholder="Your name"/>
+    </div>
+  </div>
+}
   <div className="row mb-3">
     <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">Email</label>
     <div className="col-sm-10">
