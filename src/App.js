@@ -6,42 +6,47 @@ initialiizeAuthentication();
 const googleProvider=new GoogleAuthProvider();
 function App() {
 
+  //set all the states
   const auth=getAuth();
   const[email,setEmail]=useState('');
   const[password,setPassword]=useState('');
   const[error,setError]=useState('');
   const[isLogin,setIsLogin]=useState(false);
   const[name,setName]=useState('');
-
+  
+  //handle google sign in
   const handleGoogleSignIn=()=>{
    signInWithPopup(auth,googleProvider)
    .then(res=>{
      const user=res.user;
      console.log(user)
     })
-}
+  }
   
- const handleRegistration=(e)=>{
- e.preventDefault();
-   console.log(email,password)
+  //handle total registration
+  const handleRegistration=(e)=>{
+  e.preventDefault();
+  console.log(email,password)
    if(password.length<6){
-     setError('password must be at least 6 characters')
+      setError('password must be at least 6 characters')
      return ;
    }
    if(!/(?=.*[A-Z].*[A-Z])/.test(password)){
-     setError('password must contain upper case');
-     return;
+   setError('password must contain upper case');
+   return;
    }
    isLogin?processLogin(email,password):createNewUser(email,password)
-  }
-
-const verifyEmail=()=>{
+   }
+  
+  //verify email 
+  const verifyEmail=()=>{
   sendEmailVerification(auth.currentUser)
   .then(res=>{
     console.log(res);
   })
-}
+  }
 
+  //process login
   const processLogin=(email,password)=>{
   signInWithEmailAndPassword(auth,email,password)
   .then(res=>{
@@ -53,6 +58,7 @@ const verifyEmail=()=>{
     setError(error.message)
   })
  }
+ //reset password
 const resetPassword=()=>{
   sendPasswordResetEmail(auth,email)
   .then(res=>{
@@ -60,13 +66,16 @@ const resetPassword=()=>{
   })
 }
 
+//toggle form
 const toggleLogin=e=>{
   setIsLogin(e.target.checked);
 }
 
+
 const handleEmailChange=e=>{
   setEmail(e.target.value);
 }
+
 const handleNameChange=e=>{
   setName(e.target.value);
 }
@@ -88,6 +97,7 @@ const createNewUser=(email,password)=>{
      setError(error.message)
    })
 }
+
 const setUserName=()=>{
   updateProfile(auth.currentUser,{
     displayName:name
