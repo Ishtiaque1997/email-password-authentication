@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import { getAuth, signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithPopup,GoogleAuthProvider,sendEmailVerification,createUserWithEmailAndPassword,sendPasswordResetEmail,signInWithEmailAndPassword } from "firebase/auth";
 import initialiizeAuthentication from './firebase/firebaseinit';
 initialiizeAuthentication();
 const googleProvider=new GoogleAuthProvider();
@@ -19,13 +19,9 @@ function App() {
      console.log(user)
     })
 }
-
-
-
-
   
  const handleRegistration=(e)=>{
-  e.preventDefault();
+ e.preventDefault();
    console.log(email,password)
    if(password.length<6){
      setError('password must be at least 6 characters')
@@ -35,23 +31,38 @@ function App() {
      setError('password must contain upper case');
      return;
    }
-  isLogin?processLogin(email,password):createNewUser(email,password)
-    
+   isLogin?processLogin(email,password):createNewUser(email,password)
+  }
+
+const verifyEmail=()=>{
+  sendEmailVerification(auth.currentUser)
+  .then(res=>{
+    console.log(res);
+  })
 }
-const processLogin=(email,password)=>{
+
+  const processLogin=(email,password)=>{
   signInWithEmailAndPassword(auth,email,password)
   .then(res=>{
     const user=res.user;
     console.log(user);
+    setError('');
   })
   .catch(error=>{
     setError(error.message)
   })
-
+ }
+const resetPassword=()=>{
+  sendPasswordResetEmail(auth,email)
+  .then(res=>{
+    console.log(res);
+  })
 }
+
 const toggleLogin=e=>{
   setIsLogin(e.target.checked);
 }
+
 const handleEmailChange=e=>{
   setEmail(e.target.value);
 }
@@ -66,6 +77,7 @@ const createNewUser=(email,password)=>{
      const user=res.user;
      console.log(user);
      setError('');
+     verifyEmail();
    })
    .catch(error=>{
      setError(error.message)
@@ -104,6 +116,8 @@ const createNewUser=(email,password)=>{
     {error}
   </div>
   <button type="submit" className="btn btn-primary">{isLogin?'Login':'Register'}</button>
+  <br />
+  <button onClick={resetPassword}>Forget password</button>
 </form>
       <br /><br /><br />
     <div>--------------</div>
